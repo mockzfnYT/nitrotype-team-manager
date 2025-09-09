@@ -509,6 +509,7 @@ def index():
             total_races = db.session.query(func.sum(TeamMember.total_team_races)).scalar() or 0
             members = TeamMember.query.order_by(TeamMember.total_team_races.desc()).all()
             recent_activity = ActivityLog.query.order_by(ActivityLog.timestamp.desc()).limit(10).all()
+            
             last_check = BotConfig.get_value('last_check')
             last_check_time = None
             if last_check:
@@ -533,6 +534,8 @@ def index():
                 bot_status=bot_status
             )
     except Exception as e:
+        import traceback
+        print(traceback.format_exc())
         logger.error(f"Error in dashboard: {e}")
         return "Error loading dashboard", 500
 
@@ -583,10 +586,14 @@ def api_run_check():
         def run_check():
             bot = NitrotypeTeamBot()
             bot.run_team_check()
+        
         thread = threading.Thread(target=run_check)
         thread.start()
-        BotConfig.set_value('last_check', datetime.utcnow().isoformat())
-        return jsonify({'success': True})
+        
+        with app.app_context():
+            BotConfig.set_value('bot_status', 'running')
+        
+        return jsonify({'success': True, 'message': 'Team check started'})
     except Exception as e:
         logger.error(f"Error in run-check API: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
