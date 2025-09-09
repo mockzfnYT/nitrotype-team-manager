@@ -515,7 +515,8 @@ def index():
                 try: last_check_time = datetime.fromisoformat(last_check)
                 except Exception: last_check_time = None
 
-            # Provide stats as a dictionary for template
+            bot_status = BotConfig.get_value('bot_status', 'unknown')
+
             stats = {
                 "total_members": total_members,
                 "active_members": active_members,
@@ -528,7 +529,8 @@ def index():
                 stats=stats,
                 members=members,
                 recent_activity=recent_activity,
-                last_check_time=last_check_time
+                last_check_time=last_check_time,
+                bot_status=bot_status
             )
     except Exception as e:
         logger.error(f"Error in dashboard: {e}")
@@ -563,9 +565,13 @@ def api_dashboard_data():
                 "total_members": TeamMember.query.count(),
                 "total_races": db.session.query(func.sum(TeamMember.total_team_races)).scalar() or 0,
             }
+            last_check = BotConfig.get_value('last_check')
+            bot_status = BotConfig.get_value('bot_status', 'unknown')
             return jsonify({
                 "members": members_json,
-                "stats": stats
+                "stats": stats,
+                "last_check": last_check,
+                "bot_status": bot_status
             })
     except Exception as e:
         logger.error(f"Error in dashboard-data API: {e}")
