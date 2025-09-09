@@ -514,12 +514,18 @@ def index():
             if last_check:
                 try: last_check_time = datetime.fromisoformat(last_check)
                 except Exception: last_check_time = None
+
+            # Provide stats as a dictionary for template
+            stats = {
+                "total_members": total_members,
+                "active_members": active_members,
+                "new_members": new_members,
+                "recently_left": recently_left,
+                "total_races": total_races
+            }
+
             return render_template('index.html',
-                total_members=total_members,
-                active_members=active_members,
-                new_members=new_members,
-                recently_left=recently_left,
-                total_races=total_races,
+                stats=stats,
                 members=members,
                 recent_activity=recent_activity,
                 last_check_time=last_check_time
