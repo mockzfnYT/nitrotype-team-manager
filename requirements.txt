@@ -8,3 +8,4 @@ fake-useragent
 undetected-chromedriver
 selenium-stealth
 cloudscraper
+gunicorn
