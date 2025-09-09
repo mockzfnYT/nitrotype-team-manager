@@ -2,135 +2,132 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[NTFAM] Nitrotype Family - Team Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>[NTFAM] Nitrotype Family</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f6fa; color: #222; margin: 0; padding: 0;}
+        .container { max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 8px; box-shadow: 0 0 8px #eee; padding: 2rem;}
+        h1, h2, h3 { color: #0356a8; }
+        .stats { display: flex; gap: 2rem; margin-bottom: 1.5rem; }
+        .stat { background: #f0f4fc; border-radius: 6px; padding: 1rem 2rem; min-width: 120px; text-align: center;}
+        .btn { padding: 0.5em 1em; color: #fff; background: #0356a8; border: none; border-radius: 5px; cursor: pointer; font-size: 1em;}
+        .btn:active { background: #023d7a;}
+        .section { margin-bottom: 2rem;}
+        .table { width: 100%; border-collapse: collapse; margin-top: 1rem;}
+        .table th, .table td { padding: 0.6em 0.8em; border-bottom: 1px solid #e8e8e8;}
+        .table th { background: #eaf2fb;}
+        .badge { display: inline-block; background: #d4edda; color: #155724; padding: 0.2em 0.6em; border-radius: 4px; margin-left: 0.5em;}
+        .activity-list { list-style: none; padding: 0;}
+        .activity-list li { margin-bottom: 0.5em;}
+        @media (max-width: 700px) {
+            .container { padding: 0.5rem; }
+            .stats { flex-direction: column; gap: 0.8rem;}
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="fas fa-racing-flag me-2"></i>
-                [NTFAM] Nitrotype Family
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<div class="container">
+    <h1>[NTFAM] Nitrotype Family</h1>
+    <div class="stats">
+        <div class="stat">
+            <h3>Total Members</h3>
+            <div>{{ stats.total_members }}</div>
         </div>
-    </nav>
-    <div class="container-fluid mt-4">
-        <!-- Flash messages and bot status alerts omitted for brevity -->
-        <!-- Team Statistics -->
-        <div class="row mb-4">
-            <div class="col-md-3 mb-3">
-                <div class="card stat-card bg-primary text-white">
-                    <div class="card-body">
-                        <h6 class="card-title mb-0">Total Members</h6>
-                        <h2 class="mb-0">{{ stats.get('total_members', 0) }}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card stat-card bg-success text-white">
-                    <div class="card-body">
-                        <h6 class="card-title mb-0">Active Members</h6>
-                        <h2 class="mb-0">{{ stats.get('active_members', 0) }}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card stat-card bg-warning text-white">
-                    <div class="card-body">
-                        <h6 class="card-title mb-0">Total Races</h6>
-                        <h2 class="mb-0">{{ "{:,}".format(stats.get('total_races', 0)) }}</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="card stat-card bg-info text-white">
-                    <div class="card-body">
-                        <h6 class="card-title mb-0">Bot Status</h6>
-                        <h2 class="mb-0">{{ stats.get('bot_status', 'Unknown') }}</h2>
-                    </div>
-                </div>
-            </div>
+        <div class="stat">
+            <h3>Active Members</h3>
+            <div>{{ stats.active_members }}</div>
         </div>
-        <!-- Team Members Table -->
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="fas fa-table me-2"></i>Team Members</h5>
-            </div>
-            <div class="card-body p-0">
-                {% if members %}
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Display Name</th>
-                                <th>Username</th>
-                                <th>Last 24 Hours</th>
-                                <th>This Week</th>
-                                <th>Total Team Races</th>
-                                <th>NTC Owed</th>
-                                <th>Payment Progress</th>
-                                <th>Min Requirements</th>
-                                <th>Date Joined/Left</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for member in members %}
-                            <tr>
-                                <td><strong>{{ member.display_name }}</strong></td>
-                                <td><a href="{{ member.profile_url }}" target="_blank">{{ member.username }}</a></td>
-                                <td>{{ member.last_24_hours }}</td>
-                                <td>{{ member.this_week }}</td>
-                                <td>{{ member.total_team_races }}</td>
-                                <td>{{ member.ntc_owed }}</td>
-                                <td>{{ member.payment_progress }}</td>
-                                <td>{{ member.min_requirements_status }}</td>
-                                <td>{{ member.date_joined_left }}</td>
-                                <td>{{ member.status }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+        <div class="stat">
+            <h3>Total Races</h3>
+            <div>{{ stats.total_races }}</div>
+        </div>
+        <div class="stat">
+            <h3>Last Update</h3>
+            <div id="last-update">
+                {% if bot_status == 'running' %}
+                    <span class="badge" style="background:#fff3cd;color:#856404;">In progress...</span>
+                {% elif last_check_time %}
+                    <span>{{ last_check_time.strftime('%Y-%m-%d %H:%M:%S') }}</span>
                 {% else %}
-                <div class="text-center py-5">
-                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">No team members found</h5>
-                    <p class="text-muted">Team data will appear here after the first scan.</p>
-                </div>
+                    <span>No update yet</span>
                 {% endif %}
             </div>
+            <button class="btn" id="refresh-btn" onclick="runCheck()">Refresh</button>
+            <div id="refresh-status"></div>
         </div>
-        <!-- Recent Activity -->
-        {% if recent_activity %}
-        <div class="card mt-4">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Activity</h5>
+    </div>
+
+    <div class="section">
+        <h2>Team Members</h2>
+        {% if members|length == 0 %}
+            <div>No team members found<br>
+                <small>Team data will appear here after the first scan.</small>
             </div>
-            <div class="card-body">
-                <div class="list-group list-group-flush">
-                    {% for activity in recent_activity %}
-                    <div class="list-group-item">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ activity.action.replace('_', ' ').title() }}{% if activity.member_username %} - {{ activity.member_username }}{% endif %}</h6>
-                            <small class="text-muted">{{ activity.timestamp.strftime('%H:%M:%S') }}</small>
-                        </div>
-                        {% if activity.details %}
-                        <p class="mb-1 text-muted">{{ activity.details }}</p>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+        {% else %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Display Name</th>
+                        <th>Username</th>
+                        <th>Races (24h)</th>
+                        <th>Races (Week)</th>
+                        <th>Total Races</th>
+                        <th>NTC Owed</th>
+                        <th>Progress</th>
+                        <th>Status</th>
+                        <th>Joined/Left</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for member in members %}
+                    <tr>
+                        <td>{{ member.display_name }}</td>
+                        <td>
+                            <a href="{{ member.profile_url }}" target="_blank">{{ member.username }}</a>
+                            {% if member.is_new %}
+                                <span class="badge">New</span>
+                            {% endif %}
+                            {% if member.recently_left %}
+                                <span class="badge" style="background:#f8d7da;color:#721c24;">Left</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ member.last_24_hours }}</td>
+                        <td>{{ member.this_week }}</td>
+                        <td>{{ member.total_team_races }}</td>
+                        <td>{{ member.ntc_owed }}</td>
+                        <td>{{ member.payment_progress }}</td>
+                        <td>{{ member.status }}</td>
+                        <td>{{ member.date_joined_left }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         {% endif %}
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+
+    <div class="section">
+        <h2>Recent Activity</h2>
+        {% if recent_activity|length == 0 %}
+            <div>No recent activity logged.</div>
+        {% else %}
+            <ul class="activity-list">
+            {% for act in recent_activity %}
+                <li>
+                    <b>{{ act.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</b>:
+                    <span>{{ act.action }}</span>
+                    {% if act.member_username %} - <span>{{ act.member_username }}</span>{% endif %}
+                    {% if act.details %} - <span>{{ act.details }}</span>{% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function runCheck() {
+    var btn = document.getElementById('refresh-btn');
+    var status = document.getElementById('refresh-status');
+    btn.disabled = true;
+    status.innerText = 'In progress...';
+    fetch('/api/run-check', {method
