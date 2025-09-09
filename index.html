@@ -3,447 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nitrotype Team Manager</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 30px;
-            background: #f8f9fa;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .stat-label {
-            color: #666;
-            text-transform: uppercase;
-            font-size: 0.9em;
-            letter-spacing: 1px;
-        }
-
-        .controls {
-            padding: 20px 30px;
-            background: white;
-            border-bottom: 1px solid #eee;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-right: 10px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .members-section {
-            padding: 30px;
-        }
-
-        .section-title {
-            font-size: 1.8em;
-            margin-bottom: 25px;
-            color: #333;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 10px;
-        }
-
-        .members-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .members-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: left;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.9em;
-            letter-spacing: 1px;
-        }
-
-        .members-table td {
-            padding: 18px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            transition: background-color 0.3s ease;
-        }
-
-        .members-table tr:hover td {
-            background-color: #f8f9ff;
-        }
-
-        .members-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-away {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            font-size: 1.1em;
-        }
-
-        .loading::after {
-            content: '';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            margin-left: 10px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin: 20px;
-            border: 1px solid #f5c6cb;
-        }
-
-        .last-updated {
-            text-align: center;
-            color: #666;
-            font-size: 0.9em;
-            padding: 20px;
-            border-top: 1px solid #eee;
-            background: #f8f9fa;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                padding: 20px;
-            }
-            
-            .members-table {
-                font-size: 0.9em;
-            }
-            
-            .members-table th,
-            .members-table td {
-                padding: 12px 10px;
-            }
-        }
-    </style>
+    <title>[NTFAM] Nitrotype Family - Team Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏎️ Nitrotype Team Manager</h1>
-            <p>Automated team management and reward distribution</p>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-racing-flag me-2"></i>
+                [NTFAM] Nitrotype Family
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
         </div>
-
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card">
-                <div class="stat-number" id="activeMembersCount">-</div>
-                <div class="stat-label">Active Members</div>
+    </nav>
+    <div class="container-fluid mt-4">
+        <!-- Flash messages and bot status alerts omitted for brevity -->
+        <!-- Team Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card bg-primary text-white">
+                    <div class="card-body">
+                        <h6 class="card-title mb-0">Total Members</h6>
+                        <h2 class="mb-0">{{ stats.get('total_members', 0) }}</h2>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalRacesCount">-</div>
-                <div class="stat-label">Total Races</div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card bg-success text-white">
+                    <div class="card-body">
+                        <h6 class="card-title mb-0">Active Members</h6>
+                        <h2 class="mb-0">{{ stats.get('active_members', 0) }}</h2>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="rewardsGivenCount">-</div>
-                <div class="stat-label">Rewards Given</div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card bg-warning text-white">
+                    <div class="card-body">
+                        <h6 class="card-title mb-0">Total Races</h6>
+                        <h2 class="mb-0">{{ "{:,}".format(stats.get('total_races', 0)) }}</h2>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="dailyActivityCount">-</div>
-                <div class="stat-label">Today's Activity</div>
+            <div class="col-md-3 mb-3">
+                <div class="card stat-card bg-info text-white">
+                    <div class="card-body">
+                        <h6 class="card-title mb-0">Bot Status</h6>
+                        <h2 class="mb-0">{{ stats.get('bot_status', 'Unknown') }}</h2>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="controls">
-            <button class="btn" onclick="refreshData()">🔄 Refresh Data</button>
-            <button class="btn" onclick="runTeamCheck()">⚡ Run Team Check</button>
-            <button class="btn" onclick="exportData()">📊 Export Data</button>
+        <!-- Team Members Table -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-table me-2"></i>Team Members</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if members %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Display Name</th>
+                                <th>Username</th>
+                                <th>Last 24 Hours</th>
+                                <th>This Week</th>
+                                <th>Total Team Races</th>
+                                <th>NTC Owed</th>
+                                <th>Payment Progress</th>
+                                <th>Min Requirements</th>
+                                <th>Date Joined/Left</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in members %}
+                            <tr>
+                                <td><strong>{{ member.display_name }}</strong></td>
+                                <td><a href="{{ member.profile_url }}" target="_blank">{{ member.username }}</a></td>
+                                <td>{{ member.last_24_hours }}</td>
+                                <td>{{ member.this_week }}</td>
+                                <td>{{ member.total_team_races }}</td>
+                                <td>{{ member.ntc_owed }}</td>
+                                <td>{{ member.payment_progress }}</td>
+                                <td>{{ member.min_requirements_status }}</td>
+                                <td>{{ member.date_joined_left }}</td>
+                                <td>{{ member.status }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No team members found</h5>
+                    <p class="text-muted">Team data will appear here after the first scan.</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
-
-        <div class="members-section">
-            <h2 class="section-title">Team Members</h2>
-            <div id="loadingIndicator" class="loading">Loading team data...</div>
-            <div id="errorMessage" class="error" style="display: none;"></div>
-            
-            <table class="members-table" id="membersTable" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Races Completed</th>
-                        <th>Last Active</th>
-                        <th>Rewards Given</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="membersTableBody">
-                </tbody>
-            </table>
+        <!-- Recent Activity -->
+        {% if recent_activity %}
+        <div class="card mt-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for activity in recent_activity %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ activity.action.replace('_', ' ').title() }}{% if activity.member_username %} - {{ activity.member_username }}{% endif %}</h6>
+                            <small class="text-muted">{{ activity.timestamp.strftime('%H:%M:%S') }}</small>
+                        </div>
+                        {% if activity.details %}
+                        <p class="mb-1 text-muted">{{ activity.details }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-
-        <div class="last-updated" id="lastUpdated">
-            Last updated: Never
-        </div>
+        {% endif %}
     </div>
-
-    <script>
-        let dashboardData = null;
-
-        // Load dashboard data on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDashboardData();
-            // Auto-refresh every 5 minutes
-            setInterval(loadDashboardData, 300000);
-        });
-
-        async function loadDashboardData() {
-            try {
-                showLoading(true);
-                const response = await fetch('/api/dashboard-data');
-                const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                
-                dashboardData = data;
-                updateDashboard(data);
-                showLoading(false);
-                
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-                showError('Failed to load dashboard data: ' + error.message);
-                showLoading(false);
-            }
-        }
-
-        function updateDashboard(data) {
-            // Update stats
-            document.getElementById('activeMembersCount').textContent = data.stats.active_members || 0;
-            document.getElementById('totalRacesCount').textContent = (data.stats.total_races || 0).toLocaleString();
-            
-            // Calculate total rewards given
-            const totalRewards = data.members.reduce((sum, member) => sum + (member.rewards_given || 0), 0);
-            document.getElementById('rewardsGivenCount').textContent = '$' + totalRewards.toLocaleString();
-            
-            // Calculate daily activity (placeholder)
-            document.getElementById('dailyActivityCount').textContent = Math.floor(Math.random() * 50) + 10;
-
-            // Update members table
-            const tbody = document.getElementById('membersTableBody');
-            tbody.innerHTML = '';
-            
-            data.members.forEach(member => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><strong>${member.username}</strong></td>
-                    <td>${member.races.toLocaleString()}</td>
-                    <td>${formatLastActive(member.last_active)}</td>
-                    <td>$${member.rewards_given || 0}</td>
-                    <td><span class="status-badge status-${member.status}">${member.status}</span></td>
-                `;
-                tbody.appendChild(row);
-            });
-
-            // Update last updated time
-            document.getElementById('lastUpdated').textContent = 
-                'Last updated: ' + new Date().toLocaleTimeString();
-        }
-
-        function formatLastActive(dateString) {
-            if (!dateString) return 'Unknown';
-            
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffMs = now - date;
-            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-            
-            if (diffHours < 1) return 'Recently';
-            if (diffHours < 24) return diffHours + 'h ago';
-            
-            const diffDays = Math.floor(diffHours / 24);
-            return diffDays + 'd ago';
-        }
-
-        function showLoading(show) {
-            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
-            document.getElementById('membersTable').style.display = show ? 'none' : 'table';
-        }
-
-        function showError(message) {
-            const errorElement = document.getElementById('errorMessage');
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
-            setTimeout(() => {
-                errorElement.style.display = 'none';
-            }, 5000);
-        }
-
-        async function refreshData() {
-            await loadDashboardData();
-        }
-
-        async function runTeamCheck() {
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '⏳ Running Check...';
-            
-            try {
-                const response = await fetch('/api/run-check', {
-                    method: 'POST'
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('Team check completed successfully!');
-                    await loadDashboardData();
-                } else {
-                    alert('Team check failed: ' + (result.error || 'Unknown error'));
-                }
-            } catch (error) {
-                alert('Error running team check: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = '⚡ Run Team Check';
-            }
-        }
-
-        function exportData() {
-            if (!dashboardData) {
-                alert('No data to export');
-                return;
-            }
-            
-            const csvContent = "data:text/csv;charset=utf-8," 
-                + "Username,Races Completed,Last Active,Rewards Given,Status\n"
-                + dashboardData.members.map(member => 
-                    `${member.username},${member.races},"${member.last_active}",${member.rewards_given},${member.status}`
-                ).join('\n');
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `nitrotype_team_data_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
