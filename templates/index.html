@@ -2,132 +2,131 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>[NTFAM] Nitrotype Family</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>[NTFAM] Nitrotype Family Team Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        body { font-family: Arial, sans-serif; background: #f5f6fa; color: #222; margin: 0; padding: 0;}
-        .container { max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 8px; box-shadow: 0 0 8px #eee; padding: 2rem;}
-        h1, h2, h3 { color: #0356a8; }
-        .stats { display: flex; gap: 2rem; margin-bottom: 1.5rem; }
-        .stat { background: #f0f4fc; border-radius: 6px; padding: 1rem 2rem; min-width: 120px; text-align: center;}
-        .btn { padding: 0.5em 1em; color: #fff; background: #0356a8; border: none; border-radius: 5px; cursor: pointer; font-size: 1em;}
-        .btn:active { background: #023d7a;}
-        .section { margin-bottom: 2rem;}
-        .table { width: 100%; border-collapse: collapse; margin-top: 1rem;}
-        .table th, .table td { padding: 0.6em 0.8em; border-bottom: 1px solid #e8e8e8;}
-        .table th { background: #eaf2fb;}
-        .badge { display: inline-block; background: #d4edda; color: #155724; padding: 0.2em 0.6em; border-radius: 4px; margin-left: 0.5em;}
-        .activity-list { list-style: none; padding: 0;}
-        .activity-list li { margin-bottom: 0.5em;}
-        @media (max-width: 700px) {
-            .container { padding: 0.5rem; }
-            .stats { flex-direction: column; gap: 0.8rem;}
-        }
+        body { font-family: Arial, sans-serif; background: #fafafa; margin: 0; }
+        .container { max-width: 1100px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);}
+        h1, h2, h3 { margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px 12px; border-bottom: 1px solid #eee;}
+        th { background: #f5f5f5; }
+        .status-active { color: green; }
+        .status-left { color: red; }
+        .status-new { color: blue; }
+        .btn { padding: 6px 14px; border: none; border-radius: 4px; background: #0073e6; color: white; cursor: pointer; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        #refresh-status { margin-left: 10px; font-weight: bold; }
+        .no-data { color: #888; text-align: center; }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>[NTFAM] Nitrotype Family</h1>
-    <div class="stats">
-        <div class="stat">
-            <h3>Total Members</h3>
-            <div>{{ stats.total_members }}</div>
+    <div class="container">
+        <h1>[NTFAM] Nitrotype Family</h1>
+        <div style="margin-bottom: 16px;">
+            <span><strong>Total Members:</strong> {{ stats.total_members }}</span> &nbsp;|&nbsp;
+            <span><strong>Active Members:</strong> {{ stats.active_members }}</span> &nbsp;|&nbsp;
+            <span><strong>Total Races:</strong> {{ stats.total_races }}</span>
         </div>
-        <div class="stat">
-            <h3>Active Members</h3>
-            <div>{{ stats.active_members }}</div>
-        </div>
-        <div class="stat">
-            <h3>Total Races</h3>
-            <div>{{ stats.total_races }}</div>
-        </div>
-        <div class="stat">
+        <div style="margin-bottom:20px;">
             <h3>Last Update</h3>
-            <div id="last-update">
+            <span id="last-update">
                 {% if bot_status == 'running' %}
-                    <span class="badge" style="background:#fff3cd;color:#856404;">In progress...</span>
+                    In progress...
                 {% elif last_check_time %}
-                    <span>{{ last_check_time.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                    {{ last_check_time.strftime('%Y-%m-%d %H:%M:%S') }}
                 {% else %}
-                    <span>No update yet</span>
+                    No update yet
                 {% endif %}
-            </div>
-            <button class="btn" id="refresh-btn" onclick="runCheck()">Refresh</button>
-            <div id="refresh-status"></div>
+            </span>
+            <button id="refresh-btn" class="btn" onclick="runCheck()">Refresh</button>
+            <span id="refresh-status"></span>
         </div>
-    </div>
-
-    <div class="section">
         <h2>Team Members</h2>
-        {% if members|length == 0 %}
-            <div>No team members found<br>
-                <small>Team data will appear here after the first scan.</small>
-            </div>
-        {% else %}
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Display Name</th>
-                        <th>Username</th>
-                        <th>Races (24h)</th>
-                        <th>Races (Week)</th>
-                        <th>Total Races</th>
-                        <th>NTC Owed</th>
-                        <th>Progress</th>
-                        <th>Status</th>
-                        <th>Joined/Left</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for member in members %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Display Name</th>
+                    <th>Username</th>
+                    <th>Last 24 Hours</th>
+                    <th>This Week</th>
+                    <th>Total Team Races</th>
+                    <th>NTC Owed</th>
+                    <th>Payment Progress</th>
+                    <th>Min Requirements</th>
+                    <th>Date Joined/Left</th>
+                    <th>Status</th>
+                    <th>Profile</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if members|length == 0 %}
+                <tr><td colspan="11" class="no-data">No team members found<br>Team data will appear here after the first scan.</td></tr>
+                {% else %}
+                    {% for member in members %}
                     <tr>
                         <td>{{ member.display_name }}</td>
-                        <td>
-                            <a href="{{ member.profile_url }}" target="_blank">{{ member.username }}</a>
-                            {% if member.is_new %}
-                                <span class="badge">New</span>
-                            {% endif %}
-                            {% if member.recently_left %}
-                                <span class="badge" style="background:#f8d7da;color:#721c24;">Left</span>
-                            {% endif %}
-                        </td>
+                        <td>{{ member.username }}</td>
                         <td>{{ member.last_24_hours }}</td>
                         <td>{{ member.this_week }}</td>
                         <td>{{ member.total_team_races }}</td>
                         <td>{{ member.ntc_owed }}</td>
                         <td>{{ member.payment_progress }}</td>
-                        <td>{{ member.status }}</td>
+                        <td>{{ member.min_requirements_status }}</td>
                         <td>{{ member.date_joined_left }}</td>
+                        <td>
+                            {% if member.status == 'active' %}<span class="status-active">Active</span>
+                            {% elif member.status == 'left' %}<span class="status-left">Left</span>
+                            {% elif member.status == 'new' %}<span class="status-new">New</span>
+                            {% else %}{{ member.status }}{% endif %}
+                        </td>
+                        <td><a href="{{ member.profile_url }}" target="_blank">More</a></td>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-    </div>
-
-    <div class="section">
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
         <h2>Recent Activity</h2>
-        {% if recent_activity|length == 0 %}
-            <div>No recent activity logged.</div>
-        {% else %}
-            <ul class="activity-list">
-            {% for act in recent_activity %}
-                <li>
-                    <b>{{ act.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</b>:
-                    <span>{{ act.action }}</span>
-                    {% if act.member_username %} - <span>{{ act.member_username }}</span>{% endif %}
-                    {% if act.details %} - <span>{{ act.details }}</span>{% endif %}
-                </li>
-            {% endfor %}
-            </ul>
-        {% endif %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                    <th>Username</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if recent_activity|length == 0 %}
+                <tr><td colspan="4" class="no-data">No recent activity</td></tr>
+                {% else %}
+                {% for log in recent_activity %}
+                <tr>
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ log.action }}</td>
+                    <td>{{ log.member_username }}</td>
+                    <td>{{ log.details }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
     </div>
-</div>
-
-<script>
-function runCheck() {
-    var btn = document.getElementById('refresh-btn');
-    var status = document.getElementById('refresh-status');
-    btn.disabled = true;
-    status.innerText = 'In progress...';
-    fetch('/api/run-check', {method
+    <script>
+    function runCheck() {
+        document.getElementById('refresh-status').innerText = 'In progress...';
+        fetch('/api/run-check', {method: 'POST'})
+            .then(r => r.json())
+            .then(data => {
+                if(data.success) {
+                    document.getElementById('refresh-status').innerText = 'Update requested! Please refresh this page in a moment.';
+                } else {
+                    document.getElementById('refresh-status').innerText = 'Error: ' + (data.error || 'Unknown error');
+                }
+            }).catch(err => {
+                document.getElementById('refresh-status').innerText = 'Error: ' + err;
+            });
+    }
+    </script>
+</body>
+</html>
