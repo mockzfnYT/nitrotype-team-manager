@@ -2,131 +2,608 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>[NTFAM] Nitrotype Family Team Manager</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        body { font-family: Arial, sans-serif; background: #fafafa; margin: 0; }
-        .container { max-width: 1100px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);}
-        h1, h2, h3 { margin-top: 0; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 8px 12px; border-bottom: 1px solid #eee;}
-        th { background: #f5f5f5; }
-        .status-active { color: green; }
-        .status-left { color: red; }
-        .status-new { color: blue; }
-        .btn { padding: 6px 14px; border: none; border-radius: 4px; background: #0073e6; color: white; cursor: pointer; }
-        .btn:disabled { background: #ccc; cursor: not-allowed; }
-        #refresh-status { margin-left: 10px; font-weight: bold; }
-        .no-data { color: #888; text-align: center; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--success-color));
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        .update-section {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .update-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .update-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.running {
+            background: var(--warning-color);
+        }
+
+        .status-indicator.error {
+            background: var(--danger-color);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            text-align: left;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-left {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-new {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .profile-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .profile-link:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        .no-data {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 3rem;
+            font-style: italic;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .refresh-status {
+            margin-left: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .refresh-status.success {
+            color: var(--success-color);
+        }
+
+        .refresh-status.error {
+            color: var(--danger-color);
+        }
+
+        .activity-timestamp {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .activity-action {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header {
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .update-section {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            table {
+                font-size: 0.75rem;
+            }
+
+            th, td {
+                padding: 0.5rem 0.25rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>[NTFAM] Nitrotype Family</h1>
-        <div style="margin-bottom: 16px;">
-            <span><strong>Total Members:</strong> {{ stats.total_members }}</span> &nbsp;|&nbsp;
-            <span><strong>Active Members:</strong> {{ stats.active_members }}</span> &nbsp;|&nbsp;
-            <span><strong>Total Races:</strong> {{ stats.total_races }}</span>
+        <div class="header">
+            <h1>[NTFAM] Nitrotype Family</h1>
+            <p style="color: var(--text-secondary); margin-top: 0.5rem;">Team Management Dashboard</p>
         </div>
-        <div style="margin-bottom:20px;">
-            <h3>Last Update</h3>
-            <span id="last-update">
-                {% if bot_status == 'running' %}
-                    In progress...
-                {% elif last_check_time %}
-                    {{ last_check_time.strftime('%Y-%m-%d %H:%M:%S') }}
-                {% else %}
-                    No update yet
-                {% endif %}
-            </span>
-            <button id="refresh-btn" class="btn" onclick="runCheck()">Refresh</button>
-            <span id="refresh-status"></span>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_members }}</div>
+                <div class="stat-label">Total Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.active_members }}</div>
+                <div class="stat-label">Active Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.new_members }}</div>
+                <div class="stat-label">New Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.recently_left }}</div>
+                <div class="stat-label">Recently Left</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ "{:,}".format(stats.total_races) }}</div>
+                <div class="stat-label">Total Races</div>
+            </div>
         </div>
-        <h2>Team Members</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Display Name</th>
-                    <th>Username</th>
-                    <th>Last 24 Hours</th>
-                    <th>This Week</th>
-                    <th>Total Team Races</th>
-                    <th>NTC Owed</th>
-                    <th>Payment Progress</th>
-                    <th>Min Requirements</th>
-                    <th>Date Joined/Left</th>
-                    <th>Status</th>
-                    <th>Profile</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if members|length == 0 %}
-                <tr><td colspan="11" class="no-data">No team members found<br>Team data will appear here after the first scan.</td></tr>
-                {% else %}
-                    {% for member in members %}
-                    <tr>
-                        <td>{{ member.display_name }}</td>
-                        <td>{{ member.username }}</td>
-                        <td>{{ member.last_24_hours }}</td>
-                        <td>{{ member.this_week }}</td>
-                        <td>{{ member.total_team_races }}</td>
-                        <td>{{ member.ntc_owed }}</td>
-                        <td>{{ member.payment_progress }}</td>
-                        <td>{{ member.min_requirements_status }}</td>
-                        <td>{{ member.date_joined_left }}</td>
-                        <td>
-                            {% if member.status == 'active' %}<span class="status-active">Active</span>
-                            {% elif member.status == 'left' %}<span class="status-left">Left</span>
-                            {% elif member.status == 'new' %}<span class="status-new">New</span>
-                            {% else %}{{ member.status }}{% endif %}
-                        </td>
-                        <td><a href="{{ member.profile_url }}" target="_blank">More</a></td>
-                    </tr>
-                    {% endfor %}
-                {% endif %}
-            </tbody>
-        </table>
-        <h2>Recent Activity</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Action</th>
-                    <th>Username</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if recent_activity|length == 0 %}
-                <tr><td colspan="4" class="no-data">No recent activity</td></tr>
-                {% else %}
-                {% for log in recent_activity %}
-                <tr>
-                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    <td>{{ log.action }}</td>
-                    <td>{{ log.member_username }}</td>
-                    <td>{{ log.details }}</td>
-                </tr>
-                {% endfor %}
-                {% endif %}
-            </tbody>
-        </table>
+
+        <div class="update-section">
+            <div class="update-info">
+                <h3>Last Update</h3>
+                <div class="update-status">
+                    <div class="status-indicator {% if bot_status == 'running' %}running{% elif bot_status == 'error' %}error{% endif %}"></div>
+                    <span id="last-update">
+                        {% if bot_status == 'running' %}
+                            In progress...
+                        {% elif last_check_time %}
+                            {{ last_check_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                        {% else %}
+                            No update yet
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button id="refresh-btn" class="btn" onclick="runCheck()">
+                    <span id="btn-text">Refresh Data</span>
+                    <span id="btn-spinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+                <div id="refresh-status" class="refresh-status"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Team Members</h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Display Name</th>
+                            <th>Username</th>
+                            <th>Last 24h</th>
+                            <th>This Week</th>
+                            <th>Total Races</th>
+                            <th>NTC Owed</th>
+                            <th>Payment Progress</th>
+                            <th>Min Requirements</th>
+                            <th>Date Joined/Left</th>
+                            <th>Status</th>
+                            <th>Profile</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if members|length == 0 %}
+                        <tr>
+                            <td colspan="11" class="no-data">
+                                No team members found<br>
+                                <small>Team data will appear here after the first scan.</small>
+                            </td>
+                        </tr>
+                        {% else %}
+                            {% for member in members %}
+                            <tr>
+                                <td><strong>{{ member.display_name }}</strong></td>
+                                <td style="font-family: monospace; color: var(--text-secondary);">{{ member.username }}</td>
+                                <td>{{ "{:,}".format(member.last_24_hours) }}</td>
+                                <td>{{ "{:,}".format(member.this_week) }}</td>
+                                <td><strong>{{ "{:,}".format(member.total_team_races) }}</strong></td>
+                                <td>{{ member.ntc_owed }}</td>
+                                <td>{{ member.payment_progress }}</td>
+                                <td style="font-size: 0.75rem;">{{ member.min_requirements_status }}</td>
+                                <td style="font-size: 0.75rem;">{{ member.date_joined_left }}</td>
+                                <td>
+                                    {% if member.status == 'active' %}
+                                        <span class="status-badge status-active">● Active</span>
+                                    {% elif member.status == 'left' %}
+                                        <span class="status-badge status-left">● Left</span>
+                                    {% elif member.status == 'new' %}
+                                        <span class="status-badge status-new">● New</span>
+                                    {% else %}
+                                        <span class="status-badge">{{ member.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ member.profile_url }}" target="_blank" class="profile-link">View Profile</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recent Activity</h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Action</th>
+                            <th>Member</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if recent_activity|length == 0 %}
+                        <tr>
+                            <td colspan="4" class="no-data">
+                                No recent activity
+                            </td>
+                        </tr>
+                        {% else %}
+                        {% for log in recent_activity %}
+                        <tr>
+                            <td class="activity-timestamp">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td class="activity-action">{{ log.action.replace('_', ' ').title() }}</td>
+                            <td style="font-family: monospace;">{{ log.member_username or '—' }}</td>
+                            <td style="font-size: 0.875rem;">{{ log.details }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
     <script>
-    function runCheck() {
-        document.getElementById('refresh-status').innerText = 'In progress...';
-        fetch('/api/run-check', {method: 'POST'})
-            .then(r => r.json())
-            .then(data => {
-                if(data.success) {
-                    document.getElementById('refresh-status').innerText = 'Update requested! Please refresh this page in a moment.';
-                } else {
-                    document.getElementById('refresh-status').innerText = 'Error: ' + (data.error || 'Unknown error');
+        let isRefreshing = false;
+
+        function runCheck() {
+            if (isRefreshing) return;
+            
+            isRefreshing = true;
+            const btn = document.getElementById('refresh-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnSpinner = document.getElementById('btn-spinner');
+            const status = document.getElementById('refresh-status');
+            const lastUpdate = document.getElementById('last-update');
+            
+            // Update UI
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            btnSpinner.style.display = 'inline-block';
+            status.textContent = 'Starting team check...';
+            status.className = 'refresh-status';
+            lastUpdate.textContent = 'In progress...';
+            
+            fetch('/api/run-check', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            }).catch(err => {
-                document.getElementById('refresh-status').innerText = 'Error: ' + err;
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    status.textContent = 'Update started successfully! Page will auto-refresh when complete.';
+                    status.className = 'refresh-status success';
+                    
+                    // Auto-refresh after 30 seconds
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 30000);
+                } else {
+                    throw new Error(data.error || 'Unknown error occurred');
+                }
+            })
+            .catch(error => {
+                status.textContent = 'Error: ' + error.message;
+                status.className = 'refresh-status error';
+                
+                // Re-enable button after error
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btnText.style.display = 'inline';
+                    btnSpinner.style.display = 'none';
+                    isRefreshing = false;
+                }, 3000);
             });
-    }
+        }
+
+        // Auto-refresh every 2 minutes if not manually triggered
+        let autoRefreshInterval = setInterval(() => {
+            if (!isRefreshing) {
+                fetch('/api/dashboard-data')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update last check time if changed
+                        const currentLastUpdate = document.getElementById('last-update').textContent;
+                        if (data.bot_status === 'success' && data.last_check && 
+                            !currentLastUpdate.includes('In progress')) {
+                            const lastCheckDate = new Date(data.last_check);
+                            const formattedDate = lastCheckDate.toLocaleString();
+                            if (currentLastUpdate !== formattedDate) {
+                                window.location.reload();
+                            }
+                        }
+                    })
+                    .catch(console.error);
+            }
+        }, 120000); // 2 minutes
+
+        // Clear auto-refresh when page is about to unload
+        window.addEventListener('beforeunload', () => {
+            clearInterval(autoRefreshInterval);
+        });
     </script>
 </body>
 </html>
