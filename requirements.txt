@@ -1,0 +1,10 @@
+Flask
+flask_sqlalchemy
+sqlalchemy
+werkzeug
+requests
+selenium
+fake-useragent
+undetected-chromedriver
+selenium-stealth
+cloudscraper
