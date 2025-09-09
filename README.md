@@ -1,92 +1,70 @@
-# Nitrotype Team Manager Bot
+# [NTFAM] Nitrotype Family - Team Dashboard
 
-An automated team management bot for Nitrotype that tracks member activity, monitors race completions, and distributes rewards based on milestones.
+This project is an advanced Nitrotype team management dashboard powered by Flask, SQLAlchemy, Selenium, and anti-bot techniques.  
+It tracks member stats, milestones, rewards, team activity, and offers a modern Bootstrap dashboard UI.
 
 ## Features
 
-- **Automated Login**: Handles Nitrotype's React-based authentication system
-- **Team Monitoring**: Tracks member join/leave events and race completions
-- **Milestone Detection**: Automatically detects when members reach race milestones (1K, 5K, 10K, etc.)
-- **Reward Distribution**: Sends Nitrotype cash rewards based on achievements
-- **Web Dashboard**: Real-time dashboard showing team statistics and member activity
-- **Database Logging**: SQLite database to track all activities and member history
-- **24/7 Operation**: Designed for continuous monitoring on free hosting platforms
+- **Automatic Nitrotype login** via Selenium and API with advanced anti-detection
+- **Cloudflare bypass** strategies
+- **Team member scraping** and milestone tracking
+- **Reward calculation** and logging
+- **Dashboard** with live stats, activity log, refresh and manual check
+- **Bootstrap & FontAwesome** UI
 
-## Project Structure
+## Setup
 
-```
-nitrotype-team-manager/
-├── main.py              # Main bot application with Flask web interface
-├── templates/
-│   └── index.html       # Dashboard web interface
-├── nitrotype_data.db    # SQLite database (created automatically)
-├── requirements.txt     # Python dependencies
-└── README.md           # This file
-```
+1. **Clone repo**
 
-## Installation
-
-### Local Development
-
-1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/nitrotype-team-manager.git
+   git clone https://github.com/mockzfnYT/nitrotype-team-manager.git
    cd nitrotype-team-manager
    ```
 
-2. **Install dependencies:**
+2. **Install dependencies**
+
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Install Chrome WebDriver:**
-   - Download ChromeDriver from https://chromedriver.chromium.org/
-   - Add to your PATH or place in project directory
+3. **Set environment variables**
 
-4. **Configure credentials:**
-   - Edit `main.py` and update the USERNAME and PASSWORD variables
-   - For production, use environment variables:
-     ```bash
-     export NITROTYPE_USERNAME="your_username"
-     export NITROTYPE_PASSWORD="your_password"
-     ```
+   - `NITROTYPE_USERNAME` – Your Nitrotype account username
+   - `NITROTYPE_PASSWORD` – Your Nitrotype account password
+   - `SESSION_SECRET` – (optional) Flask session secret
+   - `DATABASE_URL` – (optional) DB connection string
 
-5. **Run the application:**
+4. **Run the app**
+
    ```bash
    python main.py
    ```
 
-6. **Access dashboard:**
-   - Open http://localhost:5000 in your browser
+5. **Open dashboard**
 
-### Deployment to Render
+   - Visit [http://localhost:5000](http://localhost:5000) in your browser.
 
-1. **Connect your GitHub repository to Render**
+## Deployment
 
-2. **Set environment variables in Render:**
-   - `NITROTYPE_USERNAME`: Your Nitrotype username
-   - `NITROTYPE_PASSWORD`: Your Nitrotype password
+- **Render, Heroku, or any cloud platform:**  
+  - Add your environment variables in the dashboard
+  - Make sure geckodriver/chromedriver is available if using Selenium
 
-3. **Use the following build settings:**
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `python main.py`
+## File Structure
 
-4. **Chrome WebDriver setup for Render:**
-   The bot automatically configures Chrome options for headless operation on hosting platforms.
+- `main.py` – All backend logic, models, bot, routes, and Flask app
+- `templates/index.html` – Dashboard UI
+- `requirements.txt` – Dependencies
+- `.gitignore` – Recommended files to exclude
 
-## Usage
+## FAQ
 
-### Web Dashboard
+- **Cloudflare blocking?**  
+  See dashboard alert for solutions: try VPN, AWS API Gateway, or deploy on another platform/IP.
 
-The web dashboard provides:
+- **Add new features or change UI?**  
+  Edit `main.py` for backend logic, `index.html` for dashboard appearance.
 
-- **Team Statistics**: Active member count, total races, rewards distributed
-- **Member Table**: Detailed view of each team member's progress
-- **Manual Controls**: Buttons to refresh data and run team checks
-- **Export Function**: Download team data as CSV
+## Credits
 
-### API Endpoints
-
-- `GET /` - Web dashboard
-- `GET /api/dashboard-data` - Get current team data as JSON
-- `
+Created by [mockzfnYT](https://github.com/mockzfnYT)
